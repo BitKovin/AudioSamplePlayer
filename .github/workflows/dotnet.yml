@@ -1,4 +1,4 @@
-name: Build .NET Single-File
+name: .NET (Windows)
 
 on:
   push:
@@ -7,47 +7,26 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-    name: Build for ${{ matrix.runtime }}
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            runtime: linux-x64
-          - os: windows-latest
-            runtime: win-x64
-          - os: macos-latest
-            runtime: osx-x64
+  build-windows:
+    runs-on: windows-latest
 
     steps:
-      # Standard official checkout
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: false
 
-      # Install .NET 10
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: 8.0.x
 
-      # Restore
-      - name: Restore
+      - name: Restore dependencies
         run: dotnet restore
 
-      # Publish single-file, self-contained executable
-      - name: Publish single-file
-        run: |
-          dotnet publish -c Release -r ${{ matrix.runtime }} \
-            --self-contained true \
-            -p:PublishSingleFile=true \
-            -p:PublishTrimmed=false \
-            -o publish/${{ matrix.runtime }}
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
 
-      # Upload as artifact
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: AudioSamplePlayer-${{ matrix.runtime }}
-          path: publish/${{ matrix.runtime }}
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
