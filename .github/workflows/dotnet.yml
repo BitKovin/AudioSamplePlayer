@@ -1,6 +1,5 @@
 name: Build & Release (Windows single-file)
 
-# Trigger on pushes to main (adjust if you prefer tags or manual dispatch)
 on:
   push:
     branches: [ "main" ]
@@ -31,13 +30,8 @@ jobs:
         run: dotnet build --no-restore --configuration Release
 
       - name: Publish single-file self-contained (win-x64)
-        # Adjust project path if your .csproj is not in repo root
-        run: |
-          dotnet publish -c Release -r win-x64 \
-            -p:PublishSingleFile=true \
-            -p:UseAppHost=true \
-            --self-contained true \
-            -o publish/win-x64
+        # single-line command so PowerShell parsing doesn't choke
+        run: dotnet publish -c Release -r win-x64 -p:PublishSingleFile=true -p:UseAppHost=true --self-contained true -o publish/win-x64
 
       - name: Show publish output (for debug)
         run: dir publish\win-x64
@@ -54,13 +48,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Tag name created for this run; change to semantic tag if you push tags instead
           tag_name: v${{ github.run_number }}
           release_name: Release ${{ github.run_number }}
           draft: false
           prerelease: false
-          body: |
-            Automated release from workflow run ${{ github.run_id }} (build ${{ github.run_number }}).
+          body: Automated release from workflow run ${{ github.run_id }} (build ${{ github.run_number }}).
 
       - name: Upload release asset (zip)
         uses: actions/upload-release-asset@v1
