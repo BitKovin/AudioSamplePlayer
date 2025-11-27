@@ -78,7 +78,7 @@ namespace SimpleAudioPlayer
             }
         }
 
-        private void DgFiles_KeyDown(object sender, KeyEventArgs e)
+        private void DgFiles_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Space)
             {
@@ -95,6 +95,24 @@ namespace SimpleAudioPlayer
                     PlaySelected(false);
                 }
                 e.Handled = true;
+            }
+            else if (e.Key == Key.Enter)
+            {
+                e.Handled = true;
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    PlaySelected(false);
+                }), System.Windows.Threading.DispatcherPriority.Background);
+            }
+            else if (e.Key == Key.Left)
+            {
+                e.Handled = true;
+                SeekRelative(-2.0);
+            }
+            else if (e.Key == Key.Right)
+            {
+                e.Handled = true;
+                SeekRelative(+2.0);
             }
         }
 
@@ -145,27 +163,6 @@ namespace SimpleAudioPlayer
             }
         }
 
-        private void DgFiles_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                e.Handled = true;
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    PlaySelected(false);
-                }), System.Windows.Threading.DispatcherPriority.Background);
-            }
-            else if (e.Key == Key.Left)
-            {
-                e.Handled = true;
-                SeekRelative(-2.0);
-            }
-            else if (e.Key == Key.Right)
-            {
-                e.Handled = true;
-                SeekRelative(+2.0);
-            }
-        }
 
         private void BtnPlay_Click(object sender, RoutedEventArgs e)
         {
@@ -209,6 +206,9 @@ namespace SimpleAudioPlayer
 
             try
             {
+                audioPlayer.Stop();
+                audioPlayer = new AudioPlayer();
+
                 double start = double.TryParse(txtStart.Text, out var s) ? s : 0;
                 double end = double.TryParse(txtEnd.Text, out var en) ? en : 0;
                 if (segment && end > start)
