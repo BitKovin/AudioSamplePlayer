@@ -46,10 +46,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ github.run_number }}
+          tag_name: Automatic Release
           release_name: Automatic Release ${{ github.run_number }}
           draft: false
-          prerelease: false
+          prerelease: true
           body: Automated release from workflow run ${{ github.run_id }} (build ${{ github.run_number }}).
 
       - name: Upload release asset (zip)
