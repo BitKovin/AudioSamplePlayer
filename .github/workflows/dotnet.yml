@@ -26,14 +26,13 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Restore
-        run: dotnet restore -f net8.0-windows
+        run: dotnet restore
 
       - name: Build
-        run: dotnet build --configuration Release
+        run: dotnet build --no-restore --configuration Release
 
-      - name: Publish (framework-dependent, single-file, win-x64)
-        run: |
-          dotnet publish -c Release -f net8.0-windows -r win-x64 -p:PublishSingleFile=true -p:SelfContained=false -p:UseAppHost=true -o publish/win-x64
+      - name: Publish
+        run: dotnet publish -c Release -r win-x64 -p:PublishSingleFile=true -p:UseAppHost=true -o publish/win-x64
 
       - name: Zip publish output
         run: |
