@@ -46,7 +46,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: Automatic_Release ${{ github.run_number }}
+          tag_name: Automatic_Release_${{ github.run_number }}
           release_name: Automatic Release ${{ github.run_number }}
           draft: false
           prerelease: true
