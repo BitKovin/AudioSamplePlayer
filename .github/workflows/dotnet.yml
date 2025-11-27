@@ -1,16 +1,18 @@
-name: Build Single-File Executables (minimal)
+name: Build .NET Single-File
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
+    name: Build for ${{ matrix.runtime }}
     runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: ubuntu-latest
             runtime: linux-x64
@@ -19,31 +21,32 @@ jobs:
           - os: macos-latest
             runtime: osx-x64
 
-    timeout-minutes: 60
-
     steps:
+      # Standard official checkout
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: false
-          persist-credentials: true
 
+      # Install .NET 10
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
 
+      # Restore
       - name: Restore
         run: dotnet restore
 
-      - name: Publish single-file self-contained
+      # Publish single-file, self-contained executable
+      - name: Publish single-file
         run: |
           dotnet publish -c Release -r ${{ matrix.runtime }} \
-            -p:PublishSingleFile=true -p:UseAppHost=true \
-            --self-contained true -o publish/${{ matrix.runtime }}
+            --self-contained true \
+            -p:PublishSingleFile=true \
+            -p:PublishTrimmed=false \
+            -o publish/${{ matrix.runtime }}
 
-      - name: Upload artifact
+      # Upload as artifact
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: AudioSamplePlayer-${{ matrix.runtime }}
