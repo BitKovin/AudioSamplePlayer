@@ -32,12 +32,12 @@ jobs:
         run: dotnet build --no-restore --configuration Release
 
       - name: Publish
-        run: dotnet publish -c Release -r win-x64 -p:PublishSingleFile=true -p:UseAppHost=true -o publish/win-x64
+        run: dotnet publish -c Release -o publish
 
       - name: Zip publish output
         run: |
           if (Test-Path publish\AudioSamplePlayer-win-x64.zip) { Remove-Item publish\AudioSamplePlayer-win-x64.zip }
-          Compress-Archive -Path publish\win-x64\* -DestinationPath publish\AudioSamplePlayer-win-x64.zip
+          Compress-Archive -Path publish\* -DestinationPath publish\AudioSamplePlayer-win-x64.zip
         shell: pwsh
 
       - id: create_release
