@@ -1,5 +1,9 @@
 name: Build & Release (Windows single-file)
 
+# allow the workflow to create releases via GITHUB_TOKEN
+permissions:
+  contents: write   # required for creating releases & uploading release assets
+
 on:
   push:
     branches: [ "main" ]
@@ -7,34 +11,28 @@ on:
 
 jobs:
   publish-windows:
-    name: Build single-file exe (win-x64) and publish Release
     runs-on: windows-latest
     timeout-minutes: 60
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: false
 
-      - name: Setup .NET
+      - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
 
-      - name: Restore dependencies
+      - name: Restore
         run: dotnet restore
 
-      - name: Build (no tests in this job)
+      - name: Build
         run: dotnet build --no-restore --configuration Release
 
-      - name: Publish single-file self-contained (win-x64)
-        # single-line command so PowerShell parsing doesn't choke
+      - name: Publish
         run: dotnet publish -c Release -r win-x64 -p:PublishSingleFile=true -p:UseAppHost=true --self-contained true -o publish/win-x64
-
-      - name: Show publish output (for debug)
-        run: dir publish\win-x64
 
       - name: Zip publish output
         run: |
@@ -42,8 +40,8 @@ jobs:
           Compress-Archive -Path publish\win-x64\* -DestinationPath publish\AudioSamplePlayer-win-x64.zip
         shell: pwsh
 
-      - name: Create GitHub Release
-        id: create_release
+      - id: create_release
+        name: Create GitHub Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
