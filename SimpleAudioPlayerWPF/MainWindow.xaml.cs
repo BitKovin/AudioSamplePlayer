@@ -1,4 +1,6 @@
 ﻿// MainWindow.xaml.cs
+using Microsoft.Win32;
+using NAudio.Wave;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -9,8 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using Microsoft.Win32;
-using NAudio.Wave;
+using System.Windows.Media;
 using TagLib;
 
 namespace SimpleAudioPlayer
@@ -118,7 +119,7 @@ namespace SimpleAudioPlayer
 
         private void MenuSelectDir_Click(object sender, RoutedEventArgs e)
         {
-            BtnSelectDir_Click(sender, e);
+             BtnSelectDir_Click(sender, e);
         }
 
         private void MenuExit_Click(object sender, RoutedEventArgs e)
@@ -208,6 +209,7 @@ namespace SimpleAudioPlayer
             {
                 audioPlayer.Stop();
                 audioPlayer = new AudioPlayer();
+                audioPlayer.SetVolume((float)sldVolume.Value / 100f);
 
                 double start = double.TryParse(txtStart.Text, out var s) ? s : 0;
                 double end = double.TryParse(txtEnd.Text, out var en) ? en : 0;
@@ -297,6 +299,13 @@ namespace SimpleAudioPlayer
 
         private void DgFiles_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            // Check if the click originated from a DataGridRow
+            var row = (e.OriginalSource as DependencyObject)?.FindAncestor<DataGridRow>();
+            if (row == null)
+            {
+                return; // Ignore if not on a row (e.g., scrollbar)
+            }
+
             if (e.LeftButton == MouseButtonState.Pressed && dgFiles.SelectedItem is AudioFile af)
             {
                 DragDrop.DoDragDrop(dgFiles, new DataObject(DataFormats.FileDrop, new string[] { af.Path }), DragDropEffects.Copy);
@@ -311,4 +320,24 @@ namespace SimpleAudioPlayer
             }
         }
     }
+
+    public static class  Helper
+    {
+        
+                // Extension method to find ancestor
+        public static T FindAncestor<T>(this DependencyObject current) where T : DependencyObject
+        {
+            while (current != null)
+            {
+                if (current is T ancestor)
+                {
+                    return ancestor;
+                }
+                current = VisualTreeHelper.GetParent(current);
+            }
+            return null;
+        }
+
+    }
+
 }

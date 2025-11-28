@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Simple Audio Player" Height="700" Width="1000" MinHeight="400" MinWidth="600">
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -18,19 +19,28 @@
         <!-- Menu -->
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
-                <MenuItem Header="Select _Directory" Click="MenuSelectDir_Click"/>
+                <MenuItem Header="Select _Directory" Click="BtnSelectDir_Click"/>
                 <Separator/>
                 <MenuItem Header="E_xit" Click="MenuExit_Click"/>
             </MenuItem>
         </Menu>
 
         <!-- Toolbar -->
-        <ToolBar Grid.Row="1">
-            <Button Content="Select Directory" Click="BtnSelectDir_Click"/>
-            <Separator/>
-            <Label Content="Search:"/>
-            <TextBox x:Name="txtSearch" Width="200" TextChanged="TxtSearch_TextChanged"/>
-        </ToolBar>
+        <Grid Grid.Row="1" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0" Content="Search:" VerticalAlignment="Center"/>
+            <TextBox Grid.Column="1"
+             x:Name="txtSearch"
+             HorizontalAlignment="Stretch"
+             TextChanged="TxtSearch_TextChanged"
+             Margin="5,0,0,0" FontSize="16"/>
+        </Grid>
+
+
 
         <!-- DataGrid for files -->
         <DataGrid x:Name="dgFiles" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single"
@@ -95,4 +105,8 @@
             </StatusBarItem>
         </StatusBar>
     </Grid>
+    
+    
+    
 </Window>
+    
